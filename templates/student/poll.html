@@ -38,7 +38,7 @@
           {% endfor %}
         {% else %}
           <textarea name="q_{{ question.id }}" rows="3"
-            placeholder="Your answer (optional)"
+            placeholder="Your answer"
             {% if not poll.is_open %}disabled{% endif %}>{{ prior_answers.get(question.id, '') }}</textarea>
         {% endif %}
       </div>

@@ -27,6 +27,24 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
 
+    # Warn about insecure defaults in production-like environments
+    import warnings
+
+    if not app.testing:
+        if app.config["SECRET_KEY"] == "dev-secret-change-me":
+            warnings.warn(
+                "SECRET_KEY is set to the default development value. "
+                "Set the SECRET_KEY environment variable before deploying.",
+                stacklevel=2,
+            )
+        if app.config["ADMIN_TOKEN"] == "changeme":
+            warnings.warn(
+                "ADMIN_TOKEN is set to the default value 'changeme'. "
+                "Set the ADMIN_TOKEN environment variable before deploying.",
+                stacklevel=2,
+            )
+        app.config.update(test_config)
+
     db.init_app(app)
     migrate.init_app(app, db)
 
