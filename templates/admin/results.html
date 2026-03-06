@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Results: {{ poll.title }} – ClassPoll{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="margin-bottom:0.5rem;">
+    <a href="{{ url_for('admin.poll_detail', token=token, public_id=poll.public_id) }}" style="font-size:0.9rem;">← Back to Poll</a>
+  </div>
+  <h1>Results: {{ poll.title }}</h1>
+  <p style="color:#6b7280; font-size:0.9rem; margin-top:0.4rem;">
+    Total submissions: <strong>{{ total_submissions }}</strong>
+    &nbsp;·&nbsp;
+    <a href="" onclick="location.reload(); return false;">↻ Refresh</a>
+  </p>
+</div>
+
+{% for item in results %}
+  <div class="card">
+    <h2>{{ loop.index }}. {{ item.question.text }}</h2>
+
+    {% if item.type == 'mc' %}
+      <table>
+        <thead>
+          <tr><th>Option</th><th>Votes</th><th>%</th><th style="width:40%"></th></tr>
+        </thead>
+        <tbody>
+          {% for choice in item.question.choices %}
+            {% set data = item.choice_counts[choice.id] %}
+            <tr>
+              <td>{{ choice.text }}</td>
+              <td>{{ data.count }}</td>
+              <td>{{ data.pct }}%</td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width:{{ data.pct }}%"></div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    {% else %}
+      {% if item.texts %}
+        <div style="max-height:240px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:5px; padding:0.5rem;">
+          {% for text in item.texts %}
+            <div style="padding:0.35rem 0.5rem; {% if not loop.last %}border-bottom:1px solid #f3f4f6;{% endif %} font-size:0.92rem;">
+              {{ text }}
+            </div>
+          {% endfor %}
+        </div>
+        <p style="font-size:0.82rem; color:#6b7280; margin-top:0.4rem;">{{ item.texts | length }} response(s)</p>
+      {% else %}
+        <p style="color:#6b7280; font-size:0.9rem;">No text responses yet.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endfor %}
+{% endblock %}
