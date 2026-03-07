@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ClassPoll{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f7fa;
+      color: #222;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; margin-bottom: 1rem; }
+    h2 { font-size: 1.2rem; margin-bottom: 0.75rem; }
+    h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.55rem 1.1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: none;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn-success:hover { background: #15803d; }
+    .btn-danger  { background: #dc2626; color: #fff; }
+    .btn-danger:hover  { background: #b91c1c; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-warning { background: #f59e0b; color: #fff; }
+    .btn-warning:hover { background: #d97706; }
+    input[type=text], input[type=password], textarea, select {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    input[type=text]:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37,99,235,.2);
+    }
+    label { display: block; margin-bottom: 0.35rem; font-weight: 500; }
+    .form-group { margin-bottom: 1rem; }
+    .flash-messages { margin-bottom: 1rem; }
+    .flash { padding: 0.6rem 0.9rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.92rem; }
+    .flash.error   { background: #fee2e2; color: #991b1b; }
+    .flash.success { background: #dcfce7; color: #166534; }
+    .flash.info    { background: #dbeafe; color: #1e40af; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .badge-open   { background: #dcfce7; color: #166534; }
+    .badge-closed { background: #fee2e2; color: #991b1b; }
+    .badge-expired{ background: #fef9c3; color: #92400e; }
+    .row-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-top: 0.75rem; }
+    a { color: #2563eb; }
+    a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 0.5rem 0.65rem; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; }
+    .progress-bar-wrap { background: #e5e7eb; border-radius: 4px; height: 10px; margin-top: 4px; }
+    .progress-bar { background: #2563eb; height: 10px; border-radius: 4px; transition: width 0.3s; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

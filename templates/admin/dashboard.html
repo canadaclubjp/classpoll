@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard – ClassPoll{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+    <h1>Admin Dashboard</h1>
+    <a href="{{ url_for('admin.create_poll', token=token) }}" class="btn btn-primary">+ New Poll</a>
+  </div>
+</div>
+
+{% if polls %}
+  {% for poll in polls %}
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+          <h2 style="margin-bottom:0.3rem;">{{ poll.title }}</h2>
+          <div style="font-size:0.85rem; color:#6b7280; margin-bottom:0.4rem;">
+            Created {{ poll.created_at.strftime('%Y-%m-%d %H:%M UTC') }} ·
+            Expires {{ poll.expires_at.strftime('%Y-%m-%d %H:%M UTC') }}
+          </div>
+          {% if poll.is_expired() %}
+            <span class="badge badge-expired">Expired</span>
+          {% elif poll.is_open %}
+            <span class="badge badge-open">Open</span>
+          {% else %}
+            <span class="badge badge-closed">Closed</span>
+          {% endif %}
+        </div>
+        <div class="row-actions">
+          <a href="{{ url_for('admin.poll_detail', token=token, public_id=poll.public_id) }}" class="btn btn-secondary">Manage</a>
+          <a href="{{ url_for('admin.poll_results', token=token, public_id=poll.public_id) }}" class="btn btn-secondary">Results</a>
+          <form method="post" action="{{ url_for('admin.delete_poll', token=token, public_id=poll.public_id) }}"
+                onsubmit="return confirm('Delete this poll and all responses?')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="card" style="text-align:center; color:#6b7280;">
+    No polls yet. <a href="{{ url_for('admin.create_poll', token=token) }}">Create one</a>.
+  </div>
+{% endif %}
+{% endblock %}

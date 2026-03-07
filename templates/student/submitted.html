@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Response Submitted – ClassPoll{% endblock %}
+{% block content %}
+<div class="card" style="text-align:center; padding: 2.5rem 1.5rem;">
+  <div style="font-size:3rem; margin-bottom:0.75rem;">✅</div>
+  <h1 style="margin-bottom:0.5rem;">Response Recorded</h1>
+  <p style="color:#4b5563; margin-bottom:1.5rem;">
+    Your answer has been saved. The poll is still open — you can update your response until it closes.
+  </p>
+  <a href="{{ url_for('student.poll_view', public_id=poll.public_id) }}" class="btn btn-secondary">
+    ← Back to Poll
+  </a>
+</div>
+{% endblock %}
