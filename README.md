@@ -1,5 +1,7 @@
 # ClassPoll
 
+[![Open in VS Code](https://img.shields.io/badge/Open%20in-VS%20Code-007ACC?logo=visualstudiocode&logoColor=white)](https://vscode.dev/github/canadaclubjp/classpoll)
+
 An anonymous in-class poll/survey web app built with Flask + SQLAlchemy, designed for ~35–50 students scanning a QR code. Polls expire after 24 hours and support multiple-choice and short-text questions.
 
 ## Features
