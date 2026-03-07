@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Create Poll – ClassPoll{% endblock %}
+{% block extra_head %}
+<style>
+  .question-block {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #fafafa;
+  }
+  .choice-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; align-items: center; }
+  .choice-row input { flex: 1; }
+  .remove-btn { background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.2rem; line-height:1; padding: 0 0.25rem; }
+  .add-choice-btn, .add-q-btn { margin-top: 0.5rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Create New Poll</h1>
+  <form method="post" id="poll-form">
+    <div class="form-group">
+      <label for="title">Poll Title</label>
+      <input type="text" name="title" id="title" required placeholder="e.g. Week 3 Check-in">
+    </div>
+
+    <h2 style="margin-bottom:0.75rem;">Questions <span style="font-size:0.85rem;font-weight:400;color:#6b7280;">(2–5)</span></h2>
+    <div id="questions-container">
+      <!-- Questions injected by JS -->
+    </div>
+    <button type="button" class="btn btn-secondary add-q-btn" id="add-question">+ Add Question</button>
+
+    <div style="margin-top:1.5rem; display:flex; gap:0.75rem; flex-wrap:wrap;">
+      <button type="submit" class="btn btn-primary">Create Poll</button>
+      <a href="{{ url_for('admin.dashboard', token=token) }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+let qCount = 0;
+
+function addQuestion(type) {
+  const idx = qCount++;
+  const container = document.getElementById('questions-container');
+  const div = document.createElement('div');
+  div.className = 'question-block';
+  div.id = `q_block_${idx}`;
+
+  div.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+      <strong>Question ${idx + 1}</strong>
+      <button type="button" class="remove-btn" onclick="removeQuestion('q_block_${idx}', this)" title="Remove question">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Question text</label>
+      <input type="text" name="question_text[]" required placeholder="Question text">
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select name="question_type[]" onchange="onTypeChange(this, ${idx})">
+        <option value="mc">Multiple Choice (required)</option>
+        <option value="text">Short Text (optional)</option>
+      </select>
+    </div>
+    <div id="choices_area_${idx}">
+      <label>Choices</label>
+      <div id="choices_${idx}">
+        <div class="choice-row"><input type="text" name="choices_${idx}[]" placeholder="Option A" required><button type="button" class="remove-btn" onclick="removeChoice(this)">✕</button></div>
+        <div class="choice-row"><input type="text" name="choices_${idx}[]" placeholder="Option B" required><button type="button" class="remove-btn" onclick="removeChoice(this)">✕</button></div>
+      </div>
+      <button type="button" class="btn btn-secondary add-choice-btn" onclick="addChoice(${idx})">+ Add Option</button>
+    </div>
+  `;
+  container.appendChild(div);
+  renumberQuestions();
+}
+
+function onTypeChange(sel, idx) {
+  const area = document.getElementById(`choices_area_${idx}`);
+  if (sel.value === 'text') {
+    area.style.display = 'none';
+    area.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
+  } else {
+    area.style.display = '';
+    area.querySelectorAll('input').forEach(i => i.setAttribute('required', 'required'));
+  }
+}
+
+function addChoice(idx) {
+  const container = document.getElementById(`choices_${idx}`);
+  const row = document.createElement('div');
+  row.className = 'choice-row';
+  row.innerHTML = `<input type="text" name="choices_${idx}[]" placeholder="Option" required><button type="button" class="remove-btn" onclick="removeChoice(this)">✕</button>`;
+  container.appendChild(row);
+}
+
+function removeChoice(btn) {
+  const row = btn.closest('.choice-row');
+  const container = row.parentElement;
+  if (container.querySelectorAll('.choice-row').length > 2) {
+    row.remove();
+  } else {
+    alert('Each multiple-choice question needs at least 2 choices.');
+  }
+}
+
+function removeQuestion(id, btn) {
+  const blocks = document.querySelectorAll('.question-block');
+  if (blocks.length <= 2) {
+    alert('A poll must have at least 2 questions.');
+    return;
+  }
+  document.getElementById(id).remove();
+  renumberQuestions();
+}
+
+function renumberQuestions() {
+  document.querySelectorAll('.question-block').forEach((block, i) => {
+    block.querySelector('strong').textContent = `Question ${i + 1}`;
+  });
+}
+
+document.getElementById('add-question').addEventListener('click', () => {
+  if (document.querySelectorAll('.question-block').length >= 5) {
+    alert('Maximum 5 questions per poll.');
+    return;
+  }
+  addQuestion('mc');
+});
+
+document.getElementById('poll-form').addEventListener('submit', function(e) {
+  const blocks = document.querySelectorAll('.question-block');
+  if (blocks.length < 2) {
+    e.preventDefault();
+    alert('Add at least 2 questions.');
+  } else if (blocks.length > 5) {
+    e.preventDefault();
+    alert('Maximum 5 questions per poll.');
+  }
+});
+
+// Add 2 default questions on load
+addQuestion('mc');
+addQuestion('mc');
+</script>
+{% endblock %}
