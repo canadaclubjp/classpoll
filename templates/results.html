@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Results – {{ poll.question }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; }
+    header { background: #4a90d9; color: #fff; padding: 1rem 2rem; }
+    header h1 { font-size: 1.6rem; }
+    .container { max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    .flash { padding: 0.8rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+    .flash.success { background: #d4edda; color: #155724; }
+    .flash.error   { background: #f8d7da; color: #721c24; }
+    .card { background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.1); padding: 2rem; margin-bottom: 1rem; }
+    .card h2 { margin-bottom: 0.3rem; }
+    .meta { color: #666; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; }
+    .open   { background: #d4edda; color: #155724; }
+    .closed { background: #f8d7da; color: #721c24; }
+    .option-row { margin-bottom: 1rem; }
+    .option-row .label-line { display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.95rem; }
+    .bar-bg { background: #e9ecef; border-radius: 4px; height: 22px; overflow: hidden; }
+    .bar-fill { height: 100%; background: #4a90d9; border-radius: 4px; transition: width 0.4s; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .btn { padding: 0.5rem 1.1rem; border: none; border-radius: 4px; font-size: 0.9rem; cursor: pointer; }
+    .btn-blue   { background: #4a90d9; color: #fff; }
+    .btn-blue:hover { background: #2c6fad; }
+    .btn-yellow { background: #ffc107; color: #333; }
+    .btn-yellow:hover { background: #e0a800; }
+    .btn-green  { background: #28a745; color: #fff; }
+    .btn-green:hover { background: #1e7e34; }
+    .btn-red    { background: #dc3545; color: #fff; }
+    .btn-red:hover { background: #bd2130; }
+    a.back { color: #4a90d9; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+<header>
+  <h1><a href="{{ url_for('index') }}" style="text-decoration:none;color:#fff;">🗳 Classpoll</a></h1>
+</header>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <a class="back" href="{{ url_for('index') }}">← All Polls</a>
+
+  <div class="card">
+    <h2>{{ poll.question }}</h2>
+    <p class="meta">
+      <span class="badge {{ 'open' if poll.open else 'closed' }}">
+        {{ 'Open' if poll.open else 'Closed' }}
+      </span>
+      &nbsp; {{ poll.total_votes() }} vote{{ 's' if poll.total_votes() != 1 else '' }} total
+    </p>
+
+    {% for option in poll.options %}
+    {% set pct = poll.percentage(option) %}
+    <div class="option-row">
+      <div class="label-line">
+        <span>{{ option }}</span>
+        <span>{{ poll.votes[option] }} ({{ pct }}%)</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width: {{ pct }}%;"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <div class="actions">
+      <a href="{{ url_for('vote', poll_id=poll.id) }}" class="btn btn-blue">Vote</a>
+
+      {% if poll.open %}
+      <form method="POST" action="{{ url_for('close_poll', poll_id=poll.id) }}" style="display:inline">
+        <button type="submit" class="btn btn-yellow">Close Poll</button>
+      </form>
+      {% else %}
+      <form method="POST" action="{{ url_for('reopen_poll', poll_id=poll.id) }}" style="display:inline">
+        <button type="submit" class="btn btn-green">Reopen Poll</button>
+      </form>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('reset_poll', poll_id=poll.id) }}" style="display:inline"
+            onsubmit="return confirm('Reset all votes? This cannot be undone.');">
+        <button type="submit" class="btn btn-yellow">Reset Votes</button>
+      </form>
+
+      <form method="POST" action="{{ url_for('delete_poll', poll_id=poll.id) }}" style="display:inline"
+            onsubmit="return confirm('Delete this poll?');">
+        <button type="submit" class="btn btn-red">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

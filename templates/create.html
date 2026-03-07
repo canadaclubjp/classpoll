@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Poll – Classpoll</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; }
+    header { background: #4a90d9; color: #fff; padding: 1rem 2rem; }
+    header h1 { font-size: 1.6rem; }
+    header a { color: #fff; }
+    .container { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+    .flash { padding: 0.8rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+    .flash.success { background: #d4edda; color: #155724; }
+    .flash.error   { background: #f8d7da; color: #721c24; }
+    .card { background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.1); padding: 2rem; }
+    .card h2 { margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.3rem; font-weight: bold; font-size: 0.9rem; }
+    input[type="text"] { width: 100%; padding: 0.55rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; margin-bottom: 1rem; }
+    input[type="text"]:focus { outline: none; border-color: #4a90d9; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; margin-bottom: 1.5rem; }
+    .btn { display: inline-block; padding: 0.6rem 1.4rem; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+    .btn-primary { background: #4a90d9; color: #fff; }
+    .btn-primary:hover { background: #2c6fad; }
+    .btn-secondary { background: #e2e6ea; color: #333; text-decoration: none; }
+    .btn-secondary:hover { background: #cdd0d5; }
+    .actions { display: flex; gap: 0.75rem; align-items: center; }
+  </style>
+</head>
+<body>
+<header>
+  <h1><a href="{{ url_for('index') }}" style="text-decoration:none;color:#fff;">🗳 Classpoll</a></h1>
+</header>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card">
+    <h2>Create a New Poll</h2>
+    <form method="POST">
+      <label for="question">Question</label>
+      <input type="text" id="question" name="question" placeholder="e.g. What is Newton's first law?" required />
+
+      <label>Options <small>(enter at least 2, up to 6)</small></label>
+      <div class="options-grid">
+        {% for i in range(1, 7) %}
+        <input type="text" name="option{{ i }}" placeholder="Option {{ i }}" {% if i <= 2 %}required{% endif %} />
+        {% endfor %}
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Create Poll</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

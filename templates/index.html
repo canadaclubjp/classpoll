@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classpoll</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; }
+    header { background: #4a90d9; color: #fff; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    header h1 { font-size: 1.6rem; }
+    header a { color: #fff; text-decoration: none; background: #2c6fad; padding: 0.4rem 1rem; border-radius: 4px; }
+    .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    .flash { padding: 0.8rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+    .flash.success { background: #d4edda; color: #155724; }
+    .flash.error   { background: #f8d7da; color: #721c24; }
+    .card { background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.1); padding: 1.2rem 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+    .card h2 { font-size: 1.1rem; }
+    .card .badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin-left: 0.5rem; }
+    .open   { background: #d4edda; color: #155724; }
+    .closed { background: #f8d7da; color: #721c24; }
+    .card-actions a { margin-left: 0.5rem; text-decoration: none; color: #4a90d9; }
+    .empty { text-align: center; color: #888; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>🗳 Classpoll</h1>
+  <a href="{{ url_for('create') }}">+ New Poll</a>
+</header>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% if polls %}
+    {% for p in polls %}
+    <div class="card">
+      <div>
+        <h2>
+          {{ p.question }}
+          <span class="badge {{ 'open' if p.open else 'closed' }}">
+            {{ 'Open' if p.open else 'Closed' }}
+          </span>
+        </h2>
+        <small>{{ p.total_votes() }} vote{{ 's' if p.total_votes() != 1 else '' }}</small>
+      </div>
+      <div class="card-actions">
+        <a href="{{ url_for('vote', poll_id=p.id) }}">Vote</a>
+        <a href="{{ url_for('results', poll_id=p.id) }}">Results</a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <p>No polls yet. <a href="{{ url_for('create') }}">Create one!</a></p>
+    </div>
+  {% endif %}
+</div>
+</body>
+</html>
