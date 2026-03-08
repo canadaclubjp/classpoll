@@ -15,6 +15,9 @@ instance/
 .env
 .flaskenv
 
+# SQLite database (created at runtime)
+*.db
+
 # PyCharm / JetBrains IDE
 .idea/
 

@@ -34,6 +34,16 @@
     .btn-red    { background: #dc3545; color: #fff; }
     .btn-red:hover { background: #bd2130; }
     a.back { color: #4a90d9; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+    /* Share section */
+    .share-section { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+    .share-section img { border: 1px solid #dee2e6; border-radius: 4px; width: 160px; height: 160px; }
+    .share-info { flex: 1; min-width: 180px; }
+    .share-info h3 { margin-bottom: 0.5rem; font-size: 1rem; }
+    .share-info p { font-size: 0.85rem; color: #555; margin-bottom: 0.75rem; }
+    .url-box { display: flex; gap: 0.4rem; align-items: center; }
+    .url-box input { flex: 1; padding: 0.4rem 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; color: #333; background: #f8f9fa; }
+    .url-box button { padding: 0.4rem 0.75rem; border: none; border-radius: 4px; background: #4a90d9; color: #fff; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+    .url-box button:hover { background: #2c6fad; }
   </style>
 </head>
 <body>
@@ -72,6 +82,22 @@
     {% endfor %}
   </div>
 
+  <!-- Share card: QR code + copyable URL for students on other devices -->
+  <div class="card">
+    <h3 style="margin-bottom:1rem;">Share this poll</h3>
+    <div class="share-section">
+      <img src="{{ url_for('qr_code', poll_id=poll.id) }}" alt="QR code – scan to vote" />
+      <div class="share-info">
+        <h3>Scan to vote</h3>
+        <p>Students on the same Wi-Fi network can scan this QR code or open the link below on their device.</p>
+        <div class="url-box">
+          <input type="text" id="share-url" value="{{ share_url }}" readonly />
+          <button onclick="copyUrl()">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="actions">
       <a href="{{ url_for('vote', poll_id=poll.id) }}" class="btn btn-blue">Vote</a>
@@ -98,5 +124,15 @@
     </div>
   </div>
 </div>
+<script>
+  function copyUrl() {
+    const input = document.getElementById("share-url");
+    input.select();
+    input.setSelectionRange(0, input.value.length);
+    navigator.clipboard.writeText(input.value).catch(function() {
+      document.execCommand("copy");
+    });
+  }
+</script>
 </body>
 </html>
