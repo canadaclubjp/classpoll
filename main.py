@@ -21,7 +21,8 @@ def init_db():
             """
             CREATE TABLE IF NOT EXISTS polls (
                 id TEXT PRIMARY KEY,
-                question TEXT NOT NULL
+                question TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'open'
             )
         """
         )
@@ -36,6 +37,13 @@ def init_db():
             )
         """
         )
+        # Migration: add status column to existing databases
+        try:
+            conn.execute(
+                "ALTER TABLE polls ADD COLUMN status TEXT DEFAULT 'open'"
+            )
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         conn.commit()
 
 
@@ -59,7 +67,7 @@ def create():
             poll_id = uuid.uuid4().hex
             with get_db() as conn:
                 conn.execute(
-                    "INSERT INTO polls (id, question) VALUES (?, ?)",
+                    "INSERT INTO polls (id, question, status) VALUES (?, ?, 'open')",
                     (poll_id, question),
                 )
                 for option in options:
@@ -109,9 +117,47 @@ def results(poll_id):
             "SELECT * FROM options WHERE poll_id = ?", (poll_id,)
         ).fetchall()
     total_votes = sum(opt["votes"] for opt in options)
+    poll_url = url_for("poll", poll_id=poll_id, _external=True)
     return render_template(
-        "results.html", poll=poll_row, options=options, total_votes=total_votes
+        "results.html",
+        poll=poll_row,
+        options=options,
+        total_votes=total_votes,
+        poll_url=poll_url,
     )
+
+
+@app.route("/poll/<poll_id>/toggle_status", methods=["POST"])
+def toggle_status(poll_id):
+    with get_db() as conn:
+        poll_row = conn.execute(
+            "SELECT status FROM polls WHERE id = ?", (poll_id,)
+        ).fetchone()
+        if poll_row is None:
+            return "Poll not found", 404
+        new_status = "closed" if poll_row["status"] == "open" else "open"
+        conn.execute(
+            "UPDATE polls SET status = ? WHERE id = ?", (new_status, poll_id)
+        )
+        conn.commit()
+    return redirect(url_for("results", poll_id=poll_id))
+
+
+@app.route("/poll/<poll_id>/reset", methods=["POST"])
+def reset_votes(poll_id):
+    with get_db() as conn:
+        conn.execute("UPDATE options SET votes = 0 WHERE poll_id = ?", (poll_id,))
+        conn.commit()
+    return redirect(url_for("results", poll_id=poll_id))
+
+
+@app.route("/poll/<poll_id>/delete", methods=["POST"])
+def delete_poll(poll_id):
+    with get_db() as conn:
+        conn.execute("DELETE FROM options WHERE poll_id = ?", (poll_id,))
+        conn.execute("DELETE FROM polls WHERE id = ?", (poll_id,))
+        conn.commit()
+    return redirect(url_for("index"))
 
 
 @app.route("/qr/<poll_id>")

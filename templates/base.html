@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Classpoll{% endblock %}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f8;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: #5b8acb;
+            padding: 20px 30px;
+        }
+        header h1 {
+            color: #fff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* ── MAIN CONTAINER ── */
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 20px;
+        }
+
+        /* ── BACK LINK ── */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #5b8acb;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ── CARDS ── */
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+        }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .badge-open  { background: #d4edda; color: #2d6a4f; border-color: #b3d9c1; }
+        .badge-closed { background: #fde8e8; color: #a33;    border-color: #f5c0c0; }
+
+        /* ── POLL META (badge + vote count) ── */
+        .poll-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* ── RESULTS BARS ── */
+        .result-item { margin-bottom: 18px; }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        .result-pct { color: #555; white-space: nowrap; }
+        .bar-bg {
+            background: #e8e8e8;
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            background: #5b8acb;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        /* ── SHARE SECTION ── */
+        .share-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            margin-top: 16px;
+        }
+        .share-qr img {
+            width: 160px;
+            height: 160px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            display: block;
+        }
+        .share-info h3 {
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .share-info p {
+            color: #666;
+            font-size: 0.88rem;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        .copy-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .copy-row input[type="text"] {
+            flex: 1;
+            max-width: 280px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #444;
+            background: #fff;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .btn-blue   { background: #5b8acb; color: #fff; }
+        .btn-blue:hover   { background: #4a79ba; text-decoration: none; }
+        .btn-amber  { background: #e6b84a; color: #333; }
+        .btn-amber:hover  { background: #d9a93a; text-decoration: none; }
+        .btn-red    { background: #c0392b; color: #fff; }
+        .btn-red:hover    { background: #a93226; text-decoration: none; }
+
+        /* ── ACTION ROW ── */
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .actions form { display: inline; }
+
+        /* ── VOTE FORM (radio options) ── */
+        .option-item { margin: 10px 0; }
+        .option-item label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .option-item label:hover { background: #ebebeb; }
+
+        /* ── INDEX POLL LIST ── */
+        .poll-list { list-style: none; margin-top: 12px; }
+        .poll-list li {
+            padding: 12px 16px;
+            background: #f7f8fc;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .poll-list a { color: #5b8acb; text-decoration: none; }
+        .poll-list a:hover { text-decoration: underline; }
+
+        /* ── CREATE FORM ── */
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .form-group input[type="text"]:focus { border-color: #5b8acb; }
+        .form-section-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🗳️ Classpoll</h1>
+</header>
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+<script>
+function copyUrl(btn) {
+    var input = btn.previousElementSibling;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value).then(function() {
+            var old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = old; }, 1500);
+        });
+    } else {
+        try {
+            input.select();
+            document.execCommand('copy');
+            var old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = old; }, 1500);
+        } catch (e) {
+            alert('Copy not supported. Please copy the URL manually.');
+        }
+    }
+}
+</script>
+</body>
+</html>

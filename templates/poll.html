@@ -1,40 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ poll['question'] }} - ClassPoll</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        h1 { color: #333; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .option { margin: 10px 0; }
-        .option label { display: flex; align-items: center; gap: 10px; padding: 12px; background: #f5f5f5; border-radius: 4px; cursor: pointer; }
-        .option label:hover { background: #e8e8e8; }
-        .btn { display: inline-block; padding: 10px 20px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 10px; }
-        .btn:hover { background: #0052a3; }
-        .qr { margin-top: 20px; }
-        .qr img { border: 1px solid #ccc; border-radius: 4px; }
-    </style>
-</head>
-<body>
-    <h1>{{ poll['question'] }}</h1>
-    <p><a href="{{ url_for('index') }}">&larr; Back to home</a></p>
+{% extends "base.html" %}
+{% block title %}{{ poll['question'] }} – Classpoll{% endblock %}
+{% block content %}
+<a href="{{ url_for('index') }}" class="back-link">← All Polls</a>
+<div class="card">
+    <h1 style="font-size:1.6rem;margin-bottom:8px;">{{ poll['question'] }}</h1>
     <form method="post">
         {% for option in options %}
-        <div class="option">
+        <div class="option-item">
             <label>
                 <input type="radio" name="option_id" value="{{ option['id'] }}" required>
                 {{ option['text'] }}
             </label>
         </div>
         {% endfor %}
-        <button type="submit" class="btn">Vote</button>
+        <button type="submit" class="btn btn-blue" style="margin-top:16px;">Submit Vote</button>
     </form>
-    <div class="qr">
-        <p>Scan to open this poll:</p>
-        <img src="{{ url_for('qr_code', poll_id=poll['id']) }}" alt="QR code for this poll" width="150" height="150">
-    </div>
-</body>
-</html>
+</div>
+{% endblock %}
+

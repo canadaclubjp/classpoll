@@ -1,38 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results: {{ poll['question'] }} - ClassPoll</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        h1 { color: #333; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .result { margin: 10px 0; }
-        .result-label { margin-bottom: 4px; }
-        .bar-bg { background: #e8e8e8; border-radius: 4px; height: 24px; width: 100%; }
-        .bar { background: #0066cc; height: 24px; border-radius: 4px; min-width: 0; }
-        .vote-count { font-size: 13px; color: #555; margin-top: 2px; }
-        .btn { display: inline-block; padding: 10px 20px; background: #0066cc; color: white; border-radius: 4px; margin-top: 16px; }
-        .btn:hover { background: #0052a3; text-decoration: none; }
-        .total { margin-top: 16px; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <h1>Results: {{ poll['question'] }}</h1>
-    <p><a href="{{ url_for('index') }}">&larr; Back to home</a></p>
+{% extends "base.html" %}
+{% block title %}{{ poll['question'] }} – Classpoll{% endblock %}
+{% block content %}
+<a href="{{ url_for('index') }}" class="back-link">← All Polls</a>
+
+<!-- Results card -->
+<div class="card">
+    <h1 style="font-size:1.6rem;margin-bottom:8px;">{{ poll['question'] }}</h1>
+    <div class="poll-meta">
+        {% if poll['status'] == 'open' %}
+        <span class="badge badge-open">Open</span>
+        {% else %}
+        <span class="badge badge-closed">Closed</span>
+        {% endif %}
+        <span>{{ total_votes }} vote{% if total_votes != 1 %}s{% endif %} total</span>
+    </div>
+
     {% for option in options %}
     {% set pct = (option['votes'] / total_votes * 100) if total_votes > 0 else 0 %}
-    <div class="result">
-        <div class="result-label">{{ option['text'] }}</div>
-        <div class="bar-bg">
-            <div class="bar" style="width: {{ pct | round(1) }}%"></div>
+    <div class="result-item">
+        <div class="result-row">
+            <span>{{ option['text'] }}</span>
+            <span class="result-pct">{{ option['votes'] }} ({{ "%.1f"|format(pct) }}%)</span>
         </div>
-        <div class="vote-count">{{ option['votes'] }} vote{% if option['votes'] != 1 %}s{% endif %} ({{ pct | round(1) }}%)</div>
+        <div class="bar-bg">
+            <div class="bar-fill" style="width:{{ "%.1f"|format(pct) }}%"></div>
+        </div>
     </div>
     {% endfor %}
-    <p class="total">Total votes: {{ total_votes }}</p>
-    <a href="{{ url_for('poll', poll_id=poll['id']) }}" class="btn">Vote again</a>
-</body>
-</html>
+</div>
+
+<!-- Share / QR card -->
+<div class="card">
+    <h2 style="margin-bottom:16px;font-size:1.2rem;">Share this poll</h2>
+    <div class="share-layout">
+        <div class="share-qr">
+            <img src="{{ url_for('qr_code', poll_id=poll['id']) }}" alt="QR code – scan to vote">
+        </div>
+        <div class="share-info">
+            <h3>Scan to vote</h3>
+            <p>Students on the same Wi-Fi network can scan this QR code<br>or open the link below on their device.</p>
+            <div class="copy-row">
+                <input type="text" value="{{ poll_url }}" readonly>
+                <button class="btn btn-blue" onclick="copyUrl(this)" style="padding:6px 14px;font-size:0.88rem;">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action buttons card -->
+<div class="card">
+    <div class="actions">
+        <a href="{{ url_for('poll', poll_id=poll['id']) }}" class="btn btn-blue">Vote</a>
+        <form method="post" action="{{ url_for('toggle_status', poll_id=poll['id']) }}">
+            <button type="submit" class="btn btn-amber">
+                {% if poll['status'] == 'open' %}Close Poll{% else %}Reopen Poll{% endif %}
+            </button>
+        </form>
+        <form method="post" action="{{ url_for('reset_votes', poll_id=poll['id']) }}"
+              onsubmit="return confirm('Reset all votes to zero?')">
+            <button type="submit" class="btn btn-amber">Reset Votes</button>
+        </form>
+        <form method="post" action="{{ url_for('delete_poll', poll_id=poll['id']) }}"
+              onsubmit="return confirm('Delete this poll? This cannot be undone.')">
+            <button type="submit" class="btn btn-red">Delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

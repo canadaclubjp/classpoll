@@ -1,35 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Poll - ClassPoll</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        h1 { color: #333; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        label { display: block; margin-bottom: 4px; font-weight: bold; }
-        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .btn { display: inline-block; padding: 10px 20px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .btn:hover { background: #0052a3; }
-        .option-group { margin-bottom: 6px; }
-    </style>
-</head>
-<body>
-    <h1>Create a New Poll</h1>
-    <p><a href="{{ url_for('index') }}">&larr; Back to home</a></p>
+{% extends "base.html" %}
+{% block title %}Create Poll – Classpoll{% endblock %}
+{% block content %}
+<a href="{{ url_for('index') }}" class="back-link">← All Polls</a>
+<div class="card">
+    <h2 style="margin-bottom:20px;">Create a New Poll</h2>
     <form method="post">
-        <label for="question">Question</label>
-        <input type="text" id="question" name="question" required placeholder="Enter your question">
-
-        <label>Options (at least 2)</label>
-        <div class="option-group"><input type="text" name="options" required placeholder="Option 1"></div>
-        <div class="option-group"><input type="text" name="options" required placeholder="Option 2"></div>
-        <div class="option-group"><input type="text" name="options" placeholder="Option 3 (optional)"></div>
-        <div class="option-group"><input type="text" name="options" placeholder="Option 4 (optional)"></div>
-
-        <button type="submit" class="btn">Create Poll</button>
+        <div class="form-group">
+            <label for="question">Question</label>
+            <input type="text" id="question" name="question" required placeholder="Enter your question">
+        </div>
+        <span class="form-section-label">Options (at least 2)</span>
+        <div class="form-group"><input type="text" name="options" required placeholder="Option 1"></div>
+        <div class="form-group"><input type="text" name="options" required placeholder="Option 2"></div>
+        <div class="form-group"><input type="text" name="options" placeholder="Option 3 (optional)"></div>
+        <div class="form-group"><input type="text" name="options" placeholder="Option 4 (optional)"></div>
+        <button type="submit" class="btn btn-blue">Create Poll</button>
     </form>
-</body>
-</html>
+</div>
+{% endblock %}
+
