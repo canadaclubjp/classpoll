@@ -124,6 +124,7 @@ def qr_code(poll_id):
     return send_file(buf, mimetype="image/png")
 
 
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)

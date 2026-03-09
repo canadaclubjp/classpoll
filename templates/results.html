@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results: {{ poll['question'] }} - ClassPoll</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .result { margin: 10px 0; }
+        .result-label { margin-bottom: 4px; }
+        .bar-bg { background: #e8e8e8; border-radius: 4px; height: 24px; width: 100%; }
+        .bar { background: #0066cc; height: 24px; border-radius: 4px; min-width: 0; }
+        .vote-count { font-size: 13px; color: #555; margin-top: 2px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #0066cc; color: white; border-radius: 4px; margin-top: 16px; }
+        .btn:hover { background: #0052a3; text-decoration: none; }
+        .total { margin-top: 16px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Results: {{ poll['question'] }}</h1>
+    <p><a href="{{ url_for('index') }}">&larr; Back to home</a></p>
+    {% for option in options %}
+    {% set pct = (option['votes'] / total_votes * 100) if total_votes > 0 else 0 %}
+    <div class="result">
+        <div class="result-label">{{ option['text'] }}</div>
+        <div class="bar-bg">
+            <div class="bar" style="width: {{ pct | round(1) }}%"></div>
+        </div>
+        <div class="vote-count">{{ option['votes'] }} vote{% if option['votes'] != 1 %}s{% endif %} ({{ pct | round(1) }}%)</div>
+    </div>
+    {% endfor %}
+    <p class="total">Total votes: {{ total_votes }}</p>
+    <a href="{{ url_for('poll', poll_id=poll['id']) }}" class="btn">Vote again</a>
+</body>
+</html>
