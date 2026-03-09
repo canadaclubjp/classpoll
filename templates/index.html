@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassPoll</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul { list-style: none; padding: 0; }
+        li { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #0066cc; color: white; border-radius: 4px; }
+        .btn:hover { background: #0052a3; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>ClassPoll</h1>
+    <p><a href="{{ url_for('create') }}" class="btn">Create New Poll</a></p>
+    {% if polls %}
+    <h2>Existing Polls</h2>
+    <ul>
+        {% for poll in polls %}
+        <li>
+            <a href="{{ url_for('poll', poll_id=poll['id']) }}">{{ poll['question'] }}</a>
+            &mdash;
+            <a href="{{ url_for('results', poll_id=poll['id']) }}">Results</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No polls yet. Create one!</p>
+    {% endif %}
+</body>
+</html>
