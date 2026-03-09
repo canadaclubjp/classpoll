@@ -117,7 +117,10 @@ def results(poll_id):
 @app.route("/qr/<poll_id>")
 def qr_code(poll_id):
     url = url_for("poll", poll_id=poll_id, _external=True)
-    img = qrcode.make(url)
+    qr = qrcode.QRCode()
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image()
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     buf.seek(0)
