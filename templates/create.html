@@ -4,18 +4,54 @@
 <a href="{{ url_for('index') }}" class="back-link">← All Polls</a>
 <div class="card">
     <h2 style="margin-bottom:20px;">Create a New Poll</h2>
-    <form method="post">
+    <form method="post" id="create-form">
         <div class="form-group">
             <label for="question">Question</label>
             <input type="text" id="question" name="question" required placeholder="Enter your question">
         </div>
         <span class="form-section-label">Options (at least 2)</span>
-        <div class="form-group"><input type="text" name="options" required placeholder="Option 1"></div>
-        <div class="form-group"><input type="text" name="options" required placeholder="Option 2"></div>
-        <div class="form-group"><input type="text" name="options" placeholder="Option 3 (optional)"></div>
-        <div class="form-group"><input type="text" name="options" placeholder="Option 4 (optional)"></div>
+        <div id="options-list">
+            <div class="form-group"><input type="text" name="options" required placeholder="Option 1"></div>
+            <div class="form-group"><input type="text" name="options" required placeholder="Option 2"></div>
+            <div class="form-group"><input type="text" name="options" placeholder="Option 3 (optional)"></div>
+            <div class="form-group"><input type="text" name="options" placeholder="Option 4 (optional)"></div>
+        </div>
+        <button type="button" id="add-option-btn" class="btn btn-blue" style="margin-bottom:16px;background:#e8eef8;color:#5b8acb;border:1px solid #c0d2ec;">+ Add Option</button>
+        <br>
         <button type="submit" class="btn btn-blue">Create Poll</button>
     </form>
 </div>
+<script>
+(function() {
+    var MAX_OPTIONS = 10;
+    var list = document.getElementById('options-list');
+    var addBtn = document.getElementById('add-option-btn');
+
+    function updateAddButton() {
+        var count = list.querySelectorAll('input[name="options"]').length;
+        var isDisabled = count >= MAX_OPTIONS;
+        addBtn.disabled = isDisabled;
+        addBtn.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
+        addBtn.style.opacity = isDisabled ? '0.45' : '1';
+    }
+
+    addBtn.addEventListener('click', function() {
+        var count = list.querySelectorAll('input[name="options"]').length;
+        if (count >= MAX_OPTIONS) return;
+        var div = document.createElement('div');
+        div.className = 'form-group';
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'options';
+        input.placeholder = 'Option ' + (count + 1) + ' (optional)';
+        div.appendChild(input);
+        list.appendChild(div);
+        input.focus();
+        updateAddButton();
+    });
+
+    updateAddButton();
+})();
+</script>
 {% endblock %}
 
