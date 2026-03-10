@@ -1,0 +1,5 @@
+[build]
+buildCommand = "pip install --no-cache-dir -r requirements.txt"
+
+[deploy]
+startCommand = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers ${WEB_CONCURRENCY:-2}"

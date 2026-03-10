@@ -1,103 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}ClassPoll{% endblock %}</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f7fa;
-      color: #222;
-      min-height: 100vh;
-      padding: 1rem;
-    }
-    .container { max-width: 720px; margin: 0 auto; }
-    h1 { font-size: 1.6rem; margin-bottom: 1rem; }
-    h2 { font-size: 1.2rem; margin-bottom: 0.75rem; }
-    h3 { font-size: 1rem; margin-bottom: 0.5rem; }
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-    }
-    .btn {
-      display: inline-block;
-      padding: 0.55rem 1.1rem;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.95rem;
-      text-decoration: none;
-      font-weight: 500;
-      line-height: 1.4;
-    }
-    .btn-primary { background: #2563eb; color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-success { background: #16a34a; color: #fff; }
-    .btn-success:hover { background: #15803d; }
-    .btn-danger  { background: #dc2626; color: #fff; }
-    .btn-danger:hover  { background: #b91c1c; }
-    .btn-secondary { background: #e5e7eb; color: #374151; }
-    .btn-secondary:hover { background: #d1d5db; }
-    .btn-warning { background: #f59e0b; color: #fff; }
-    .btn-warning:hover { background: #d97706; }
-    input[type=text], input[type=password], textarea, select {
-      width: 100%;
-      padding: 0.5rem 0.65rem;
-      border: 1px solid #d1d5db;
-      border-radius: 5px;
-      font-size: 0.95rem;
-      font-family: inherit;
-    }
-    input[type=text]:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 2px rgba(37,99,235,.2);
-    }
-    label { display: block; margin-bottom: 0.35rem; font-weight: 500; }
-    .form-group { margin-bottom: 1rem; }
-    .flash-messages { margin-bottom: 1rem; }
-    .flash { padding: 0.6rem 0.9rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.92rem; }
-    .flash.error   { background: #fee2e2; color: #991b1b; }
-    .flash.success { background: #dcfce7; color: #166534; }
-    .flash.info    { background: #dbeafe; color: #1e40af; }
-    .badge {
-      display: inline-block;
-      padding: 0.15rem 0.55rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-    .badge-open   { background: #dcfce7; color: #166534; }
-    .badge-closed { background: #fee2e2; color: #991b1b; }
-    .badge-expired{ background: #fef9c3; color: #92400e; }
-    .row-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-top: 0.75rem; }
-    a { color: #2563eb; }
-    a:hover { text-decoration: underline; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 0.5rem 0.65rem; border-bottom: 1px solid #e5e7eb; }
-    th { background: #f9fafb; font-weight: 600; }
-    .progress-bar-wrap { background: #e5e7eb; border-radius: 4px; height: 10px; margin-top: 4px; }
-    .progress-bar { background: #2563eb; height: 10px; border-radius: 4px; transition: width 0.3s; }
-  </style>
-  {% block extra_head %}{% endblock %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Classpoll{% endblock %}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f8;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: #5b8acb;
+            padding: 20px 30px;
+        }
+        header h1 {
+            color: #fff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* ── MAIN CONTAINER ── */
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 20px;
+        }
+
+        /* ── BACK LINK ── */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #5b8acb;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ── CARDS ── */
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+        }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .badge-open  { background: #d4edda; color: #2d6a4f; border-color: #b3d9c1; }
+        .badge-closed { background: #fde8e8; color: #a33;    border-color: #f5c0c0; }
+
+        /* ── POLL META (badge + vote count) ── */
+        .poll-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* ── RESULTS BARS ── */
+        .result-item { margin-bottom: 18px; }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        .result-pct { color: #555; white-space: nowrap; }
+        .bar-bg {
+            background: #e8e8e8;
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            background: #5b8acb;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        /* ── SHARE SECTION ── */
+        .share-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            margin-top: 16px;
+        }
+        .share-qr img {
+            width: 160px;
+            height: 160px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            display: block;
+        }
+        .share-info h3 {
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .share-info p {
+            color: #666;
+            font-size: 0.88rem;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        .copy-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .copy-row input[type="text"] {
+            flex: 1;
+            max-width: 280px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #444;
+            background: #fff;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .btn-blue   { background: #5b8acb; color: #fff; }
+        .btn-blue:hover   { background: #4a79ba; text-decoration: none; }
+        .btn-amber  { background: #e6b84a; color: #333; }
+        .btn-amber:hover  { background: #d9a93a; text-decoration: none; }
+        .btn-red    { background: #c0392b; color: #fff; }
+        .btn-red:hover    { background: #a93226; text-decoration: none; }
+
+        /* ── ACTION ROW ── */
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .actions form { display: inline; }
+
+        /* ── VOTE FORM (radio options) ── */
+        .option-item { margin: 10px 0; }
+        .option-item label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .option-item label:hover { background: #ebebeb; }
+
+        /* ── INDEX POLL LIST ── */
+        .poll-list { list-style: none; margin-top: 12px; }
+        .poll-list li {
+            padding: 12px 16px;
+            background: #f7f8fc;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .poll-list a:not(.btn) { color: #5b8acb; text-decoration: none; }
+        .poll-list a:not(.btn):hover { text-decoration: underline; }
+
+        /* ── CREATE FORM ── */
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .form-group input[type="text"]:focus { border-color: #5b8acb; }
+        .form-section-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-          <div class="flash {{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-  {% block content %}{% endblock %}
-</div>
+<header>
+    <h1>🗳️ Classpoll</h1>
+</header>
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+<script>
+function copyUrl(btn) {
+    var input = btn.previousElementSibling;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value).then(function() {
+            var old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = old; }, 1500);
+        });
+    } else {
+        try {
+            input.select();
+            document.execCommand('copy');
+            var old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = old; }, 1500);
+        } catch (e) {
+            alert('Copy not supported. Please copy the URL manually.');
+        }
+    }
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ poll['question'] }} – Classpoll{% endblock %}
+{% block content %}
+<a href="{{ url_for('index') }}" class="back-link">← All Polls</a>
+<div class="card">
+    <h1 style="font-size:1.6rem;margin-bottom:8px;">{{ poll['question'] }}</h1>
+    <form method="post">
+        {% for option in options %}
+        <div class="option-item">
+            <label>
+                <input type="radio" name="option_id" value="{{ option['id'] }}" required>
+                {{ option['text'] }}
+            </label>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-blue" style="margin-top:16px;">Submit Vote</button>
+    </form>
+</div>
+{% endblock %}
+
