@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ poll.title }} – ClassPoll{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{{ poll.title }}</h1>
+
+  {% if not poll.is_open %}
+    <p style="color:#991b1b; font-weight:600; margin-bottom:1rem;">
+      This poll is currently closed. Submissions are not accepted.
+    </p>
+  {% elif already_submitted %}
+    <p style="color:#166534; font-weight:600; margin-bottom:1rem;">
+      You have already responded. You may update your answers below.
+    </p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('student.poll_submit', public_id=poll.public_id) }}">
+    {% for question in poll.questions %}
+      <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+        <label>
+          {{ loop.index }}. {{ question.text }}
+          {% if question.required %}
+            <span style="color:#dc2626;">*</span>
+          {% else %}
+            <span style="color:#6b7280; font-weight:400;">(optional)</span>
+          {% endif %}
+        </label>
+
+        {% if question.qtype == 'mc' %}
+          {% for choice in question.choices %}
+            <label style="font-weight:400; display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem; cursor:pointer;">
+              <input type="radio" name="q_{{ question.id }}" value="{{ choice.id }}"
+                {% if prior_answers.get(question.id) == choice.id %}checked{% endif %}
+                {% if not poll.is_open %}disabled{% endif %}
+                {% if question.required %}required{% endif %}>
+              {{ choice.text }}
+            </label>
+          {% endfor %}
+        {% else %}
+          <textarea name="q_{{ question.id }}" rows="3"
+            placeholder="Your answer"
+            {% if not poll.is_open %}disabled{% endif %}>{{ prior_answers.get(question.id, '') }}</textarea>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    {% if poll.is_open %}
+      <div style="margin-top:1.5rem;">
+        <button type="submit" class="btn btn-primary">
+          {{ 'Update Response' if already_submitted else 'Submit' }}
+        </button>
+      </div>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}
