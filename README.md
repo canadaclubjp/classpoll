@@ -21,10 +21,22 @@ If you want to create a poll at home, then use it from your iPad at university w
 
 ### Option A — Railway (recommended, easiest)
 
-1. Create a free account at https://railway.app
-2. In the Railway dashboard click **New Project → Deploy from GitHub repo** and connect this repository.
-3. Railway will auto-detect Python and deploy the app. No configuration file is needed.
-4. Once deployed, Railway gives you a public URL like `https://classpoll-production.up.railway.app`. Use that URL in your QR codes.
+> **Important:** Railway deploys from whichever branch you select. Make sure you are deploying from a branch that contains the app files (`main.py`, `requirements.txt`, `start.sh`). The safest approach is to merge this PR into `main` first, then connect Railway to `main`.
+
+**Step-by-step:**
+
+1. Merge this PR (or the branch containing the app code) into `main` on GitHub.
+2. Create a free account at https://railway.app.
+3. In the Railway dashboard click **New Project → Deploy from GitHub repo** and connect this repository.
+4. When prompted, select **`main`** as the deployment branch (or whichever branch you merged the app code into).
+5. Railway will detect the `railway.toml` in the repo and use the correct build and start commands automatically — no further configuration is needed.
+6. Once deployed, Railway gives you a public URL like `https://classpoll-production.up.railway.app`. Use that URL in your QR codes.
+
+**If you already have a Railway project connected and it is failing:**
+
+1. Go to your Railway project → **Settings → Source**.
+2. Confirm the **Branch** field is set to `main` (or the branch that has `main.py` and `requirements.txt`).
+3. Trigger a new deploy.
 
 **Free tier:** 500 hours/month — more than enough for classroom use.
 
