@@ -27,12 +27,14 @@ If you want to create a poll at home, then use it from your iPad at university w
 
 1. Go to your repository on GitHub: https://github.com/canadaclubjp/classpoll
 2. Click the **Pull requests** tab near the top of the page.
-3. Click on the open pull request in the list (the one that adds the app files).
-4. Scroll to the bottom of the pull request page until you see a green **"Merge pull request"** button.
-5. Click **"Merge pull request"**, then click **"Confirm merge"**.
-6. `main` now contains the app files.
+3. Click on the open pull request in the list that adds the app files (look for "Fix Railway deployment" — it is PR #4 if you have not merged any others yet).  
+4. Near the bottom of the pull request page you will see a grey **"Ready for review"** button — click it.  
+   *(The pull request was created as a Draft, which is why you see "Ready for review" instead of "Merge pull request". Converting it to ready unlocks the merge button.)*
+5. After clicking "Ready for review", the page refreshes and shows a green **"Merge pull request"** button at the bottom.
+6. Click **"Merge pull request"**, then click **"Confirm merge"**.
+7. `main` now contains all the app files.
 
-> **Note:** If you clicked a "View pull request" button in a GitHub notification email or on the Issues tab, that takes you to the pull request page — just keep scrolling down on that page until you find the green **"Merge pull request"** button at the bottom.
+> **Note:** If you see a "View pull request" button (e.g. in a GitHub notification email), click it — that takes you directly to the pull request page where you can follow the "Ready for review" and "Merge pull request" steps above.
 
 #### Step 2 — Deploy on Railway
 
