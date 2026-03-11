@@ -1,6 +1,6 @@
 from datetime import datetime, timezone, timedelta
 import uuid
-from . import db
+from .extensions import db
 
 
 class Poll(db.Model):

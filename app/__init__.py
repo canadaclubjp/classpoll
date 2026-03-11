@@ -1,11 +1,11 @@
 import os
+import warnings
 import click
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
-db = SQLAlchemy()
-migrate = Migrate()
+from .extensions import db, migrate
+from .models import Poll
+from .routes_student import student_bp
+from .routes_admin import admin_bp
 
 
 def create_app(test_config=None):
@@ -28,8 +28,6 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     # Warn about insecure defaults in production-like environments
-    import warnings
-
     if not app.testing:
         if app.config["SECRET_KEY"] == "dev-secret-change-me":
             warnings.warn(
@@ -46,9 +44,6 @@ def create_app(test_config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from .routes_student import student_bp
-    from .routes_admin import admin_bp
-
     app.register_blueprint(student_bp)
     app.register_blueprint(admin_bp)
 
@@ -59,8 +54,6 @@ def create_app(test_config=None):
     @app.cli.command("purge-expired")
     def purge_expired():
         """Delete all polls (and cascaded rows) whose expiry has passed."""
-        from .models import Poll
-
         all_polls = Poll.query.all()
         expired = [p for p in all_polls if p.is_expired()]
         count = len(expired)

@@ -12,7 +12,7 @@ from flask import (
     send_file,
     flash,
 )
-from . import db
+from .extensions import db
 from .models import Poll, Question, Choice, Submission, Answer
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
