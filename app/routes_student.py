@@ -17,6 +17,11 @@ student_bp = Blueprint("student", __name__)
 COOKIE_MAX_AGE = 60 * 60 * 24 * 2  # 2 days
 
 
+@student_bp.route("/")
+def index():
+    return render_template("landing.html")
+
+
 def _get_or_create_attempt(poll_public_id):
     """Return (attempt_id, is_new). Sets cookie on response when new."""
     cookie_name = f"attempt_{poll_public_id}"

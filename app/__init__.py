@@ -38,10 +38,9 @@ def create_app(test_config=None):
                 stacklevel=2,
             )
         if app.config["ADMIN_TOKEN"] == "changeme":
-            warnings.warn(
+            raise RuntimeError(
                 "ADMIN_TOKEN is set to the default value 'changeme'. "
-                "Set the ADMIN_TOKEN environment variable before deploying.",
-                stacklevel=2,
+                "Set the ADMIN_TOKEN environment variable before deploying."
             )
 
     db.init_app(app)

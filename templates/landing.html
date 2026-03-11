@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Classpoll{% endblock %}
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom:16px;">Welcome to Classpoll</h2>
+    <p style="margin-bottom:12px;">
+        <strong>Students:</strong> Ask your teacher for the poll link.
+        Poll links look like <code>/poll/&lt;id&gt;</code>.
+    </p>
+    <p>
+        <strong>Administrators:</strong> Access the admin dashboard at
+        <code>/admin/&lt;your-token&gt;</code> using the token you set in
+        your <code>ADMIN_TOKEN</code> environment variable.
+    </p>
+</div>
+{% endblock %}
