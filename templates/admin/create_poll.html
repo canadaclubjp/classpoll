@@ -1,147 +1,55 @@
 {% extends "base.html" %}
-{% block title %}Create Poll – ClassPoll{% endblock %}
-{% block extra_head %}
-<style>
-  .question-block {
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background: #fafafa;
-  }
-  .choice-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; align-items: center; }
-  .choice-row input { flex: 1; }
-  .remove-btn { background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.2rem; line-height:1; padding: 0 0.25rem; }
-  .add-choice-btn, .add-q-btn { margin-top: 0.5rem; }
-</style>
-{% endblock %}
+{% block title %}Create Poll – Classpoll{% endblock %}
 {% block content %}
+<a href="{{ url_for('admin.dashboard', token=token) }}" class="back-link">← All Polls</a>
 <div class="card">
-  <h1>Create New Poll</h1>
-  <form method="post" id="poll-form">
+  <h1 style="font-size:1.6rem;margin-bottom:20px;">Create a New Poll</h1>
+  <form method="post" id="create-form">
     <div class="form-group">
-      <label for="title">Poll Title</label>
-      <input type="text" name="title" id="title" required placeholder="e.g. Week 3 Check-in">
+      <label for="question">Question</label>
+      <input type="text" id="question" name="question" required placeholder="Enter your question">
     </div>
-
-    <h2 style="margin-bottom:0.75rem;">Questions <span style="font-size:0.85rem;font-weight:400;color:#6b7280;">(2–5)</span></h2>
-    <div id="questions-container">
-      <!-- Questions injected by JS -->
+    <span class="form-section-label">Options (at least 2)</span>
+    <div id="options-list">
+      <div class="form-group"><input type="text" name="options[]" required placeholder="Option 1"></div>
+      <div class="form-group"><input type="text" name="options[]" required placeholder="Option 2"></div>
+      <div class="form-group"><input type="text" name="options[]" placeholder="Option 3 (optional)"></div>
+      <div class="form-group"><input type="text" name="options[]" placeholder="Option 4 (optional)"></div>
     </div>
-    <button type="button" class="btn btn-secondary add-q-btn" id="add-question">+ Add Question</button>
-
-    <div style="margin-top:1.5rem; display:flex; gap:0.75rem; flex-wrap:wrap;">
-      <button type="submit" class="btn btn-primary">Create Poll</button>
-      <a href="{{ url_for('admin.dashboard', token=token) }}" class="btn btn-secondary">Cancel</a>
-    </div>
+    <button type="button" id="add-option-btn" class="btn btn-blue"
+            style="margin-bottom:16px;background:#e8eef8;color:#5b8acb;border:1px solid #c0d2ec;">+ Add Option</button>
+    <br>
+    <button type="submit" class="btn btn-blue">Create Poll</button>
   </form>
 </div>
-
 <script>
-let qCount = 0;
+(function() {
+  var MAX_OPTIONS = 10;
+  var list = document.getElementById('options-list');
+  var addBtn = document.getElementById('add-option-btn');
 
-function addQuestion(type) {
-  const idx = qCount++;
-  const container = document.getElementById('questions-container');
-  const div = document.createElement('div');
-  div.className = 'question-block';
-  div.id = `q_block_${idx}`;
-
-  div.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-      <strong>Question ${idx + 1}</strong>
-      <button type="button" class="remove-btn" onclick="removeQuestion('q_block_${idx}', this)" title="Remove question">✕</button>
-    </div>
-    <div class="form-group">
-      <label>Question text</label>
-      <input type="text" name="question_text[]" required placeholder="Question text">
-    </div>
-    <div class="form-group">
-      <label>Type</label>
-      <select name="question_type[]" onchange="onTypeChange(this, ${idx})">
-        <option value="mc">Multiple Choice (required)</option>
-        <option value="text">Short Text (optional)</option>
-      </select>
-    </div>
-    <div id="choices_area_${idx}">
-      <label>Choices</label>
-      <div id="choices_${idx}">
-        <div class="choice-row"><input type="text" name="choices_${idx}[]" placeholder="Option A" required><button type="button" class="remove-btn" onclick="removeChoice(this)">✕</button></div>
-        <div class="choice-row"><input type="text" name="choices_${idx}[]" placeholder="Option B" required><button type="button" class="remove-btn" onclick="removeChoice(this)">✕</button></div>
-      </div>
-      <button type="button" class="btn btn-secondary add-choice-btn" onclick="addChoice(${idx})">+ Add Option</button>
-    </div>
-  `;
-  container.appendChild(div);
-  renumberQuestions();
-}
-
-function onTypeChange(sel, idx) {
-  const area = document.getElementById(`choices_area_${idx}`);
-  if (sel.value === 'text') {
-    area.style.display = 'none';
-    area.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
-  } else {
-    area.style.display = '';
-    area.querySelectorAll('input').forEach(i => i.setAttribute('required', 'required'));
+  function updateAddButton() {
+    var count = list.querySelectorAll('input[name="options[]"]').length;
+    addBtn.disabled = count >= MAX_OPTIONS;
+    addBtn.style.opacity = count >= MAX_OPTIONS ? '0.45' : '1';
   }
-}
 
-function addChoice(idx) {
-  const container = document.getElementById(`choices_${idx}`);
-  const row = document.createElement('div');
-  row.className = 'choice-row';
-  row.innerHTML = `<input type="text" name="choices_${idx}[]" placeholder="Option" required><button type="button" class="remove-btn" onclick="removeChoice(this)">✕</button>`;
-  container.appendChild(row);
-}
-
-function removeChoice(btn) {
-  const row = btn.closest('.choice-row');
-  const container = row.parentElement;
-  if (container.querySelectorAll('.choice-row').length > 2) {
-    row.remove();
-  } else {
-    alert('Each multiple-choice question needs at least 2 choices.');
-  }
-}
-
-function removeQuestion(id, btn) {
-  const blocks = document.querySelectorAll('.question-block');
-  if (blocks.length <= 2) {
-    alert('A poll must have at least 2 questions.');
-    return;
-  }
-  document.getElementById(id).remove();
-  renumberQuestions();
-}
-
-function renumberQuestions() {
-  document.querySelectorAll('.question-block').forEach((block, i) => {
-    block.querySelector('strong').textContent = `Question ${i + 1}`;
+  addBtn.addEventListener('click', function() {
+    var count = list.querySelectorAll('input[name="options[]"]').length;
+    if (count >= MAX_OPTIONS) return;
+    var div = document.createElement('div');
+    div.className = 'form-group';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'options[]';
+    input.placeholder = 'Option ' + (count + 1) + ' (optional)';
+    div.appendChild(input);
+    list.appendChild(div);
+    input.focus();
+    updateAddButton();
   });
-}
 
-document.getElementById('add-question').addEventListener('click', () => {
-  if (document.querySelectorAll('.question-block').length >= 5) {
-    alert('Maximum 5 questions per poll.');
-    return;
-  }
-  addQuestion('mc');
-});
-
-document.getElementById('poll-form').addEventListener('submit', function(e) {
-  const blocks = document.querySelectorAll('.question-block');
-  if (blocks.length < 2) {
-    e.preventDefault();
-    alert('Add at least 2 questions.');
-  } else if (blocks.length > 5) {
-    e.preventDefault();
-    alert('Maximum 5 questions per poll.');
-  }
-});
-
-// Add 2 default questions on load
-addQuestion('mc');
-addQuestion('mc');
+  updateAddButton();
+})();
 </script>
 {% endblock %}

@@ -9,7 +9,7 @@ from flask import (
     abort,
     flash,
 )
-from . import db
+from .extensions import db
 from .models import Poll, Submission, Answer
 
 student_bp = Blueprint("student", __name__)

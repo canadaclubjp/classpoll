@@ -1,74 +1,77 @@
 {% extends "base.html" %}
-{% block title %}{{ poll.title }} – Admin – ClassPoll{% endblock %}
+{% block title %}{{ poll.title }} – Classpoll{% endblock %}
 {% block content %}
+<a href="{{ url_for('admin.dashboard', token=token) }}" class="back-link">← All Polls</a>
+
+<!-- Results card -->
 <div class="card">
-  <div style="margin-bottom:0.5rem;">
-    <a href="{{ url_for('admin.dashboard', token=token) }}" style="font-size:0.9rem;">← Dashboard</a>
-  </div>
-  <h1>{{ poll.title }}</h1>
-  <div style="font-size:0.85rem; color:#6b7280; margin: 0.3rem 0 0.75rem;">
-    Created {{ poll.created_at.strftime('%Y-%m-%d %H:%M UTC') }} ·
-    Expires {{ poll.expires_at.strftime('%Y-%m-%d %H:%M UTC') }}
+  <h1 style="font-size:1.6rem;margin-bottom:8px;">{{ poll.title }}</h1>
+  <div class="poll-meta">
+    {% if poll.is_expired() %}
+      <span class="badge badge-expired">Expired</span>
+    {% elif poll.is_open %}
+      <span class="badge badge-open">Open</span>
+    {% else %}
+      <span class="badge badge-closed">Closed</span>
+    {% endif %}
+    <span>{{ total_votes }} vote{% if total_votes != 1 %}s{% endif %} total</span>
   </div>
 
-  {% if poll.is_expired() %}
-    <span class="badge badge-expired">Expired</span>
-  {% elif poll.is_open %}
-    <span class="badge badge-open">Open</span>
-  {% else %}
-    <span class="badge badge-closed">Closed</span>
-  {% endif %}
+  {% for option in options %}
+  <div class="result-item">
+    <div class="result-row">
+      <span>{{ option.text }}</span>
+      <span class="result-pct">{{ option.votes }} ({{ "%.1f"|format(option.pct) }}%)</span>
+    </div>
+    <div class="bar-bg">
+      <div class="bar-fill" style="width:{{ "%.1f"|format(option.pct) }}%"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 
-  <div class="row-actions" style="margin-top:1rem;">
+<!-- Share / QR card -->
+<div class="card">
+  <h2 style="margin-bottom:16px;font-size:1.2rem;">Share this poll</h2>
+  <div class="share-layout">
+    <div class="share-qr">
+      <img src="{{ url_for('admin.poll_qr', token=token, public_id=poll.public_id) }}"
+           alt="QR code – scan to vote">
+    </div>
+    <div class="share-info">
+      <h3>Scan to vote</h3>
+      <p>Students on the same Wi-Fi network can scan this QR code<br>or open the link below on their device.</p>
+      <div class="copy-row">
+        <input type="text" value="{{ student_url }}" readonly>
+        <button class="btn btn-blue" onclick="copyUrl(this)" style="padding:6px 14px;font-size:0.88rem;">Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Action buttons card -->
+<div class="card">
+  <div class="actions">
+    <a href="{{ student_url }}" target="_blank" class="btn btn-blue">Vote</a>
     {% if not poll.is_expired() %}
       {% if poll.is_open %}
         <form method="post" action="{{ url_for('admin.close_poll', token=token, public_id=poll.public_id) }}">
-          <button type="submit" class="btn btn-warning">Close Poll</button>
+          <button type="submit" class="btn btn-amber">Close Poll</button>
         </form>
       {% else %}
         <form method="post" action="{{ url_for('admin.open_poll', token=token, public_id=poll.public_id) }}">
-          <button type="submit" class="btn btn-success">Open Poll</button>
+          <button type="submit" class="btn btn-amber">Open Poll</button>
         </form>
       {% endif %}
     {% endif %}
-    <a href="{{ url_for('admin.poll_results', token=token, public_id=poll.public_id) }}" class="btn btn-secondary">View Results</a>
+    <form method="post" action="{{ url_for('admin.reset_votes', token=token, public_id=poll.public_id) }}"
+          onsubmit="return confirm('Reset all votes to zero?')">
+      <button type="submit" class="btn btn-amber">Reset Votes</button>
+    </form>
     <form method="post" action="{{ url_for('admin.delete_poll', token=token, public_id=poll.public_id) }}"
-          onsubmit="return confirm('Delete this poll and all responses?')">
-      <button type="submit" class="btn btn-danger">Delete Poll</button>
+          onsubmit="return confirm('Delete this poll? This cannot be undone.')">
+      <button type="submit" class="btn btn-red">Delete</button>
     </form>
   </div>
-</div>
-
-<div class="card">
-  <h2>Student URL & QR Code</h2>
-  <p style="font-size:0.9rem; color:#374151; margin-bottom:0.75rem;">
-    Share this link or show the QR code:
-  </p>
-  <div style="background:#f3f4f6; padding:0.6rem 0.75rem; border-radius:5px; font-family:monospace; font-size:0.9rem; word-break:break-all; margin-bottom:1rem;">
-    <a href="{{ student_url }}" target="_blank">{{ student_url }}</a>
-  </div>
-  <img src="{{ url_for('admin.poll_qr', token=token, public_id=poll.public_id) }}"
-       alt="QR Code for poll"
-       style="width:200px; height:200px; border:1px solid #e5e7eb; border-radius:6px; display:block; margin-bottom:0.75rem;">
-  <p style="font-size:0.8rem; color:#6b7280;">Students scan this QR code to open the poll.</p>
-</div>
-
-<div class="card">
-  <h2>Questions ({{ poll.questions | length }})</h2>
-  {% for question in poll.questions %}
-    <div style="margin-bottom:0.85rem; {% if not loop.last %}border-bottom:1px solid #e5e7eb; padding-bottom:0.85rem;{% endif %}">
-      <strong>{{ loop.index }}. {{ question.text }}</strong>
-      <span style="font-size:0.8rem; color:#6b7280; margin-left:0.4rem;">
-        {% if question.qtype == 'mc' %}Multiple Choice (required){% else %}Short Text (optional){% endif %}
-      </span>
-      {% if question.qtype == 'mc' %}
-        <ul style="margin-top:0.4rem; padding-left:1.2rem; font-size:0.9rem;">
-          {% for choice in question.choices %}
-            <li>{{ choice.text }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    </div>
-  {% endfor %}
 </div>
 {% endblock %}
